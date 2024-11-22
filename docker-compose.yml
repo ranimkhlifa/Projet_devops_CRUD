@@ -1,0 +1,37 @@
+services:
+  # Service for the Node.js application
+  app:
+    build: .
+    container_name: node-app
+    ports:
+      - "4000:4000"  # Map container port 4000 to host port 4000
+    volumes:
+      - .:/app  # Mount the current directory to /app inside the container
+    networks:
+      - app-network  # Connect the service to the custom network
+    depends_on:
+      - db  # Ensure that the database service is started before the app
+
+  # Service for PostgreSQL database
+  db:
+    image: postgres:14  # Use the official PostgreSQL image
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: user  # Database user
+      POSTGRES_PASSWORD: password  # Database password
+      POSTGRES_DB: postsDEVOPS  # Database name
+    volumes:
+      - db-data:/var/lib/postgresql/data  # Mount the volume for persistent data
+    networks:
+      - app-network  # Connect the service to the same network
+    ports:
+      - "5432:5432"  # Expose PostgreSQL port
+
+# Volumes to persist database data
+volumes:
+  db-data:
+
+# Networks for the services to communicate within the same environment
+networks:
+  app-network:
+    driver: bridge
